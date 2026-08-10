@@ -1,0 +1,75 @@
+name: Release
+
+"on":
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build release binary
+        run: cargo build --release --locked
+      - name: Package archive
+        run: |
+          mkdir dist
+          cp target/release/xyzw-petsim README.md LICENSE CHANGELOG.md dist/
+          archive="xyzw-petsim-${GITHUB_REF_NAME}-x86_64-unknown-linux-gnu.tar.gz"
+          tar -czf "$archive" -C dist .
+          sha256sum "$archive" > "$archive.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-x86_64
+          path: |
+            xyzw-petsim-*.tar.gz
+            xyzw-petsim-*.tar.gz.sha256
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build release binary
+        run: cargo build --release --locked
+      - name: Package archive
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist
+          Copy-Item target/release/xyzw-petsim.exe, README.md, LICENSE, CHANGELOG.md dist/
+          $archive = "xyzw-petsim-$env:GITHUB_REF_NAME-x86_64-pc-windows-msvc.zip"
+          Compress-Archive -Path dist/* -DestinationPath $archive
+          $hash = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLower()
+          "$hash  $archive" | Out-File -Encoding ascii "$archive.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x86_64
+          path: |
+            xyzw-petsim-*.zip
+            xyzw-petsim-*.zip.sha256
+
+  publish:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" artifacts/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "xyzw-petsim $GITHUB_REF_NAME" \
+            --generate-notes \
+            --verify-tag
