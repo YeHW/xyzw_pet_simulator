@@ -115,3 +115,60 @@ pub fn run_target_cost(request: TargetCostRequest) -> Result<TargetCostOutcome, 
         relative_error_percent: relative_error,
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn request(
+        target: usize,
+        trials: usize,
+        enable_pity: bool,
+        theory_mode: TargetCostTheoryMode,
+    ) -> TargetCostRequest {
+        TargetCostRequest {
+            target,
+            trials,
+            requested_threads: Some(1),
+            seed: Some(123),
+            enable_pity,
+            theory_mode,
+        }
+    }
+
+    #[test]
+    fn rejects_targets_outside_supported_range() {
+        for target in [1, 8] {
+            assert_eq!(
+                run_target_cost(request(target, 1, true, TargetCostTheoryMode::None))
+                    .err()
+                    .as_deref(),
+                Some("目标等级必须在 2 到 7 之间")
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_zero_trials() {
+        assert_eq!(
+            run_target_cost(request(2, 0, true, TargetCostTheoryMode::None))
+                .err()
+                .as_deref(),
+            Some("trials 必须 >= 1")
+        );
+    }
+
+    #[test]
+    fn auto_mode_selects_theory_for_pity_setting() {
+        let with_pity = run_target_cost(request(2, 1, true, TargetCostTheoryMode::Auto)).unwrap();
+        assert_eq!(with_pity.theory_mode.as_str(), "pity-dp");
+        assert!(with_pity.theo_no_pity.is_none());
+        assert!(with_pity.theo_pity_dp.is_some());
+
+        let without_pity =
+            run_target_cost(request(2, 1, false, TargetCostTheoryMode::Auto)).unwrap();
+        assert_eq!(without_pity.theory_mode.as_str(), "no-pity");
+        assert!(without_pity.theo_no_pity.is_some());
+        assert!(without_pity.theo_pity_dp.is_none());
+    }
+}
