@@ -78,3 +78,39 @@ pub fn theoretical_cost_with_pity_approx(target: usize) -> f64 {
 
     required_outputs
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn assert_close(actual: f64, expected: f64) {
+        assert!((actual - expected).abs() < 1e-12, "{actual} != {expected}");
+    }
+
+    #[test]
+    fn no_pity_cost_follows_exact_recurrence() {
+        let mut expected = 1.0;
+        assert_close(theoretical_cost_no_pity(1), expected);
+
+        for (level, &p) in P.iter().enumerate().skip(1) {
+            expected *= (1.0 + p) / p;
+            assert_close(theoretical_cost_no_pity(level + 1), expected);
+        }
+    }
+
+    #[test]
+    fn target_two_pity_cost_matches_truncated_geometric_expectation() {
+        let p = P[1];
+        let q = 1.0 - p;
+        let threshold = pity_threshold(2);
+        let successful_attempts = (0..threshold)
+            .map(|failures| q.powi(failures as i32) * p * (failures as f64 + 2.0))
+            .sum::<f64>();
+        let pity_attempt = q.powi(threshold as i32) * threshold as f64;
+
+        assert_close(
+            theoretical_cost_with_pity_approx(2),
+            successful_attempts + pity_attempt,
+        );
+    }
+}

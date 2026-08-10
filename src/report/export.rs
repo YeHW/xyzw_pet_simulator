@@ -296,9 +296,9 @@ mod tests {
         ]
     }
 
-    fn test_path(extension: &str) -> std::path::PathBuf {
+    fn test_path(name: &str, extension: &str) -> std::path::PathBuf {
         std::env::temp_dir().join(format!(
-            "pet_merge_stock_drain_export_{}.{}",
+            "pet_merge_{name}_export_{}.{}",
             std::process::id(),
             extension
         ))
@@ -306,7 +306,7 @@ mod tests {
 
     #[test]
     fn writes_stock_drain_csv_with_pity_columns() {
-        let path = test_path("csv");
+        let path = test_path("stock_drain", "csv");
         write_stock_drain_samples_csv(&path, &samples(), true).unwrap();
         let content = std::fs::read_to_string(&path).unwrap();
         std::fs::remove_file(path).unwrap();
@@ -319,7 +319,7 @@ mod tests {
 
     #[test]
     fn writes_stock_drain_json_column_summaries() {
-        let path = test_path("json");
+        let path = test_path("stock_drain", "json");
         let simulation = StockDrainSimulationResult {
             trials: 2,
             threads: 1,
@@ -354,5 +354,60 @@ mod tests {
                 assert!(path.get(percentile).is_some(), "缺少字段 {percentile}");
             }
         }
+    }
+
+    #[test]
+    fn writes_target_cost_csv_in_trial_order() {
+        let path = test_path("target_cost", "csv");
+        write_target_cost_samples_csv(&path, &[9, 1, 5]).unwrap();
+        let content = std::fs::read_to_string(&path).unwrap();
+        std::fs::remove_file(path).unwrap();
+
+        assert_eq!(content, "trial,eggs\n1,9\n2,1\n3,5\n");
+    }
+
+    #[test]
+    fn writes_target_cost_json_contract() {
+        let path = test_path("target_cost", "json");
+        let simulation = TargetCostSimulationResult {
+            trials: 3,
+            threads: 1,
+            mean: 5.0,
+            std_dev: 4.0,
+            ci95_low: 0.48,
+            ci95_high: 9.52,
+            min: 1,
+            max: 9,
+            p50: 5,
+            p90: 9,
+            p95: 9,
+            samples: vec![9, 1, 5],
+        };
+        write_target_cost_summary_json(TargetCostSummaryJsonInput {
+            path: path.to_str().unwrap(),
+            command: &["xyzw-petsim".to_string(), "target-cost".to_string()],
+            target: 5,
+            enable_pity: true,
+            theory_mode: "pity-dp",
+            seed: Some(123),
+            output_csv_path: Some("samples.csv"),
+            output_json_path: Some(path.to_str().unwrap()),
+            simulation: &simulation,
+            theo_no_pity: None,
+            theo_pity_dp: Some(42.5),
+            relative_error_percent: Some(-1.25),
+        })
+        .unwrap();
+        let value: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        std::fs::remove_file(path).unwrap();
+
+        assert_eq!(value["config"]["target"], 5);
+        assert_eq!(value["config"]["theory_mode"], "pity-dp");
+        assert_eq!(value["result"]["trials"], 3);
+        assert_eq!(value["result"]["mean"], 5.0);
+        assert!(value["theory"]["no_pity_exact"].is_null());
+        assert_eq!(value["theory"]["pity_dp_approx"], 42.5);
+        assert_eq!(value["theory"]["relative_error_percent"], -1.25);
     }
 }
