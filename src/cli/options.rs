@@ -111,7 +111,7 @@ pub(crate) struct TargetCostOptions {
     #[arg(
         short = 'I',
         long = "no-interactive",
-        help = "非交互模式：缺失关键参数时报错，不询问导出"
+        help = "非交互模式：不询问 CSV 导出"
     )]
     pub(crate) no_interactive: bool,
     #[arg(short = 'q', long, help = "精简输出，仅打印摘要")]
