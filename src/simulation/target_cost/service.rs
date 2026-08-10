@@ -66,7 +66,8 @@ pub fn run_target_cost(request: TargetCostRequest) -> Result<TargetCostOutcome, 
     }
 
     let simulation_result = if request.trials == 1 {
-        let consumption = simulate_target_cost_once(request.target, request.enable_pity);
+        let consumption =
+            simulate_target_cost_once(request.target, request.seed, request.enable_pity);
         single_target_cost_result(consumption)
     } else {
         simulate_target_cost_trials(

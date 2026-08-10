@@ -31,8 +31,14 @@ fn simulate_target_cost_once_with_rng(
     }
 }
 
-pub fn simulate_target_cost_once(target: usize, enable_pity: bool) -> usize {
-    let mut rng = rand::rng();
+pub fn simulate_target_cost_once(target: usize, seed: Option<u64>, enable_pity: bool) -> usize {
+    let mut rng = match seed {
+        Some(seed) => StdRng::seed_from_u64(seed),
+        None => {
+            let mut thread_rng = rand::rng();
+            StdRng::from_rng(&mut thread_rng)
+        }
+    };
     simulate_target_cost_once_with_rng(target, enable_pity, &mut rng)
 }
 
@@ -149,6 +155,14 @@ mod tests {
                 simulate_target_cost_once_with_rng(5, enable_pity, &mut second_rng)
             );
         }
+    }
+
+    #[test]
+    fn single_run_uses_supplied_seed() {
+        let mut expected_rng = StdRng::seed_from_u64(789);
+        let expected = simulate_target_cost_once_with_rng(5, true, &mut expected_rng);
+
+        assert_eq!(simulate_target_cost_once(5, Some(789), true), expected);
     }
 
     #[test]
