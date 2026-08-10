@@ -18,7 +18,7 @@ pub(crate) enum HistOutlierMode {
 }
 
 #[derive(Debug, Parser)]
-#[command(name = "pet_merge_simulator")]
+#[command(name = "xyzw-petsim")]
 #[command(about = "宠物合成蒙特卡洛模拟器")]
 #[command(
     after_help = "合成概率 p(n): p1=0.95, p2=0.80, p3=0.65, p4=0.45, p5=0.20, p6=0.05\n保底阈值 r(n): r(n)=5*(n-1), n=2..7"

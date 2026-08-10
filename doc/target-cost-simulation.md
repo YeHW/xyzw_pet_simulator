@@ -4,7 +4,7 @@
 
 实现状态：已实现
 
-命令入口：`pet_merge_simulator target-cost [options]`。
+命令入口：`xyzw-petsim target-cost [options]`。
 
 ## 目标
 

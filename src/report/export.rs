@@ -327,7 +327,7 @@ mod tests {
         };
         write_stock_drain_summary_json(StockDrainSummaryJsonInput {
             path: path.to_str().unwrap(),
-            command: &["pet_merge_simulator".to_string(), "stock-drain".to_string()],
+            command: &["xyzw-petsim".to_string(), "stock-drain".to_string()],
             stock: [2, 0, 0, 0, 0, 0],
             enable_pity: true,
             seed: Some(123),

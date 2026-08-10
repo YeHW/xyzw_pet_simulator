@@ -4,8 +4,8 @@
 
 ## 命令入口
 
-- 使用 `pet_merge_simulator target-cost [options]` 运行目标成本模拟。
-- 使用 `pet_merge_simulator stock-drain [options]` 运行库存耗尽模拟。
+- 使用 `xyzw-petsim target-cost [options]` 运行目标成本模拟。
+- 使用 `xyzw-petsim stock-drain [options]` 运行库存耗尽模拟。
 - 必须显式指定子命令。
 
 ## 当前 target-cost 默认值
@@ -37,8 +37,8 @@
 
 ## 主命令
 
-- `pet_merge_simulator target-cost ...`
-- `pet_merge_simulator stock-drain ...`
+- `xyzw-petsim target-cost ...`
+- `xyzw-petsim stock-drain ...`
 
 ## 子命令：target-cost
 
@@ -95,13 +95,13 @@
 
 ```powershell
 # 运行 10000 次模拟，使用 4 个线程
-.\target\release\pet_merge_simulator.exe stock-drain --stock 200,2,0,0,0,3 -N 10000 -t 4 -S 111
+.\target\release\xyzw-petsim.exe stock-drain --stock 200,2,0,0,0,3 -N 10000 -t 4 -S 111
 
 # 自动选择线程数，关闭保底并使用精简输出
-.\target\release\pet_merge_simulator.exe stock-drain --stock 200,2,0,0,0,3 -N 10000 -t 0 -S 111 -D -q
+.\target\release\xyzw-petsim.exe stock-drain --stock 200,2,0,0,0,3 -N 10000 -t 0 -S 111 -D -q
 
 # 导出逐次矩阵 CSV 和汇总 JSON，使用默认文件名
-.\target\release\pet_merge_simulator.exe stock-drain --stock 200,2,0,0,0,3 -N 10000 -t 4 -S 111 -C -J
+.\target\release\xyzw-petsim.exe stock-drain --stock 200,2,0,0,0,3 -N 10000 -t 4 -S 111 -C -J
 ```
 
 ## 帮助信息
@@ -115,17 +115,17 @@
 
 ```powershell
 # 完整线性直方图，不处理异常值
-.\target\release\pet_merge_simulator.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode none
+.\target\release\xyzw-petsim.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode none
 
 # IQR 去异常值
-.\target\release\pet_merge_simulator.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode iqr --hist-iqr-k 1.5
+.\target\release\xyzw-petsim.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode iqr --hist-iqr-k 1.5
 
 # MAD 去异常值
-.\target\release\pet_merge_simulator.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode mad --hist-mad-threshold 3.5
+.\target\release\xyzw-petsim.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode mad --hist-mad-threshold 3.5
 
 # 双侧各裁剪 1%
-.\target\release\pet_merge_simulator.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode quantile --hist-quantile-alpha 0.01
+.\target\release\xyzw-petsim.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode quantile --hist-quantile-alpha 0.01
 
 # 双侧各截帽 1%，不减少样本数
-.\target\release\pet_merge_simulator.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode winsor --hist-quantile-alpha 0.01
+.\target\release\xyzw-petsim.exe target-cost -T 6 -N 200000 -I -t 4 -S 111 -B 50 --hist-outlier-mode winsor --hist-quantile-alpha 0.01
 ```

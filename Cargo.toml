@@ -3,6 +3,10 @@ name = "xyzw_pet_simulator"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "xyzw-petsim"
+path = "src/main.rs"
+
 [dependencies]
 rand = "0.10.2"
 clap = { version = "4.5.16", features = ["derive"] }
