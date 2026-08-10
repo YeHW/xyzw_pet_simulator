@@ -7,8 +7,7 @@ pub fn theoretical_cost_no_pity(target: usize) -> f64 {
     assert!((1..=7).contains(&target), "target 必须在 1..=7");
 
     let mut c = 1.0;
-    for level in 1..target {
-        let p = P[level];
+    for &p in P.iter().take(target).skip(1) {
         c *= (1.0 + p) / p;
     }
     c
