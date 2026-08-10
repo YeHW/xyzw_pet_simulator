@@ -17,11 +17,7 @@ fn simulate_target_cost_once_with_rng(
     loop {
         open_egg(&mut state);
 
-        loop {
-            let Some(level) = find_merge_level(&state, target) else {
-                break;
-            };
-
+        while let Some(level) = find_merge_level(&state, target) {
             try_merge(&mut state, level, rng);
 
             if enable_pity {
