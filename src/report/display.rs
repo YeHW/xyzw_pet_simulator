@@ -241,11 +241,7 @@ pub fn print_histogram(samples: &[usize], bins: usize, outlier: HistogramOutlier
     for (i, &count) in counts.iter().enumerate() {
         let start = min as f64 + i as f64 * width;
         let end = min as f64 + (i + 1) as f64 * width;
-        let bar_len = if max_count == 0 {
-            0
-        } else {
-            count * 40 / max_count
-        };
+        let bar_len = (count * 40).checked_div(max_count).unwrap_or(0);
         println!(
             "[{:<6.0}, {:<6.0}) | {:<40} ({})",
             start,
