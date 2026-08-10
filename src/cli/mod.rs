@@ -237,39 +237,6 @@ fn print_pet_summary(summary: &ColumnSummary<7>) {
     println!("最终宠物 P95 (1-7级): {:?}", summary.p95);
 }
 
-#[cfg(test)]
-mod tests {
-    use super::{column_means, summarize_columns};
-    use crate::simulation::StockDrainTrialResult;
-
-    #[test]
-    fn computes_stock_drain_column_summaries() {
-        let samples: Vec<_> = (0..10)
-            .map(|value| StockDrainTrialResult {
-                pets: [value; 7],
-                pity: [value; 6],
-                pity_used: [0; 6],
-            })
-            .collect();
-
-        let summary = summarize_columns::<7>(&samples, |sample| sample.pets);
-
-        assert_eq!(summary.mean, [4.5; 7]);
-        assert_eq!(summary.p5, [0; 7]);
-        assert_eq!(summary.p10, [1; 7]);
-        assert_eq!(summary.p20, [2; 7]);
-        assert_eq!(summary.p30, [3; 7]);
-        assert_eq!(summary.p40, [4; 7]);
-        assert_eq!(summary.p50, [5; 7]);
-        assert_eq!(summary.p60, [5; 7]);
-        assert_eq!(summary.p70, [6; 7]);
-        assert_eq!(summary.p80, [7; 7]);
-        assert_eq!(summary.p90, [8; 7]);
-        assert_eq!(summary.p95, [9; 7]);
-        assert_eq!(column_means::<6>(&samples, |sample| sample.pity), [4.5; 6]);
-    }
-}
-
 fn print_stock_drain_trial(result: &StockDrainTrialResult, enable_pity: bool) {
     println!("最终宠物 (1-7级): {:?}", result.pets);
     if enable_pity {
@@ -418,5 +385,38 @@ fn execute_target_cost_command(options: TargetCostOptions, command: Vec<String>)
         })
         .expect("写入 JSON 失败");
         println!("JSON 已导出到: {}", path);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{column_means, summarize_columns};
+    use crate::simulation::StockDrainTrialResult;
+
+    #[test]
+    fn computes_stock_drain_column_summaries() {
+        let samples: Vec<_> = (0..10)
+            .map(|value| StockDrainTrialResult {
+                pets: [value; 7],
+                pity: [value; 6],
+                pity_used: [0; 6],
+            })
+            .collect();
+
+        let summary = summarize_columns::<7>(&samples, |sample| sample.pets);
+
+        assert_eq!(summary.mean, [4.5; 7]);
+        assert_eq!(summary.p5, [0; 7]);
+        assert_eq!(summary.p10, [1; 7]);
+        assert_eq!(summary.p20, [2; 7]);
+        assert_eq!(summary.p30, [3; 7]);
+        assert_eq!(summary.p40, [4; 7]);
+        assert_eq!(summary.p50, [5; 7]);
+        assert_eq!(summary.p60, [5; 7]);
+        assert_eq!(summary.p70, [6; 7]);
+        assert_eq!(summary.p80, [7; 7]);
+        assert_eq!(summary.p90, [8; 7]);
+        assert_eq!(summary.p95, [9; 7]);
+        assert_eq!(column_means::<6>(&samples, |sample| sample.pity), [4.5; 6]);
     }
 }
