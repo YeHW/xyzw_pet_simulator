@@ -11,13 +11,7 @@ pub fn open_egg(state: &mut GameState) {
 
 // 查找当前是否存在可以合成的等级
 pub fn find_merge_level(state: &GameState, target: usize) -> Option<usize> {
-    for level in 1..target {
-        if state.pets[level] >= 2 {
-            return Some(level);
-        }
-    }
-
-    None
+    (1..target).find(|&level| state.pets[level] >= 2)
 }
 
 // 执行一次合成
