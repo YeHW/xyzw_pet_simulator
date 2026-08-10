@@ -258,6 +258,7 @@ fn execute_target_cost_command(options: TargetCostOptions, command: Vec<String>)
 
     let theory_mode = match options.theory_mode {
         None => ServiceTargetCostTheoryMode::Auto,
+        Some(CliTargetCostTheoryMode::Auto) => ServiceTargetCostTheoryMode::Auto,
         Some(CliTargetCostTheoryMode::None) => ServiceTargetCostTheoryMode::None,
         Some(CliTargetCostTheoryMode::NoPity) => ServiceTargetCostTheoryMode::NoPity,
         Some(CliTargetCostTheoryMode::PityDp) => ServiceTargetCostTheoryMode::PityDp,

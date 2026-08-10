@@ -47,3 +47,43 @@ pub fn resolve_output_path(flag: Option<Option<String>>, default_path: &str) -> 
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn builds_target_and_stock_run_tags() {
+        assert_eq!(
+            build_target_cost_run_tag(7, 100_000, 4, true, Some(123)),
+            "t7_n100000_th4_pon_s123"
+        );
+        assert_eq!(
+            build_stock_drain_run_tag([200, 2, 0, 0, 0, 3], 10_000, 8, false, None),
+            "stock_200-2-0-0-0-3_n10000_th8_poff_srand"
+        );
+    }
+
+    #[test]
+    fn resolves_optional_output_paths() {
+        let default_path = "default.csv";
+
+        assert_eq!(resolve_output_path(None, default_path), None);
+        assert_eq!(
+            resolve_output_path(Some(None), default_path).as_deref(),
+            Some(default_path)
+        );
+        assert_eq!(
+            resolve_output_path(Some(Some("__AUTO__".to_string())), default_path).as_deref(),
+            Some(default_path)
+        );
+        assert_eq!(
+            resolve_output_path(Some(Some("  ".to_string())), default_path).as_deref(),
+            Some(default_path)
+        );
+        assert_eq!(
+            resolve_output_path(Some(Some("custom.csv".to_string())), default_path).as_deref(),
+            Some("custom.csv")
+        );
+    }
+}

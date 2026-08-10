@@ -306,3 +306,43 @@ pub fn print_theory_value(label: &str, value: f64, leading_newline: bool) {
 pub fn print_relative_error(label: &str, value: f64) {
     println!("{}: {:+.2}%", label, value);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn percentile_interpolates_between_samples() {
+        assert_eq!(percentile(&[0, 10], 0.25), 2.5);
+        assert_eq!(percentile(&[0, 10], 0.75), 7.5);
+    }
+
+    #[test]
+    fn histogram_handles_empty_constant_and_zero_bin_inputs() {
+        print_histogram(&[], 0, HistogramOutlierConfig::default());
+        print_histogram(&[5, 5, 5], 0, HistogramOutlierConfig::default());
+        print_histogram(&[1, 2, 3], 0, HistogramOutlierConfig::default());
+    }
+
+    #[test]
+    fn histogram_handles_every_outlier_mode() {
+        let samples = [1, 2, 3, 4, 100];
+
+        for mode in [
+            HistogramOutlierMode::None,
+            HistogramOutlierMode::Iqr,
+            HistogramOutlierMode::Mad,
+            HistogramOutlierMode::Quantile,
+            HistogramOutlierMode::Winsor,
+        ] {
+            print_histogram(
+                &samples,
+                3,
+                HistogramOutlierConfig {
+                    mode,
+                    ..HistogramOutlierConfig::default()
+                },
+            );
+        }
+    }
+}

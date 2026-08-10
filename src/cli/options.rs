@@ -2,6 +2,7 @@ use clap::{Args, Parser, Subcommand, ValueEnum};
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub(crate) enum TargetCostTheoryMode {
+    Auto,
     None,
     NoPity,
     PityDp,
@@ -110,7 +111,7 @@ pub(crate) struct TargetCostOptions {
     #[arg(
         short = 'I',
         long = "no-interactive",
-        help = "非交互模式：缺失关键参数时报错，不询问导出"
+        help = "非交互模式：不询问 CSV 导出"
     )]
     pub(crate) no_interactive: bool,
     #[arg(short = 'q', long, help = "精简输出，仅打印摘要")]
@@ -211,7 +212,23 @@ fn parse_stock(s: &str) -> Result<[usize; 6], String> {
 
 #[cfg(test)]
 mod tests {
-    use super::parse_stock;
+    use clap::Parser;
+
+    use super::{CliCommand, CliOptions, TargetCostTheoryMode, parse_stock};
+
+    #[test]
+    fn parses_explicit_auto_theory_mode() {
+        let options =
+            CliOptions::try_parse_from(["xyzw-petsim", "target-cost", "-M", "auto"]).unwrap();
+
+        let CliCommand::TargetCost(options) = options.command else {
+            panic!("expected target-cost command");
+        };
+        assert!(matches!(
+            options.theory_mode,
+            Some(TargetCostTheoryMode::Auto)
+        ));
+    }
 
     #[test]
     fn parses_six_level_stock_vector() {
