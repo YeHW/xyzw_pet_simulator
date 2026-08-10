@@ -111,3 +111,55 @@ pub fn single_target_cost_result(consumption: usize) -> TargetCostSimulationResu
 pub fn relative_error_percent(observed: f64, expected: f64) -> f64 {
     (observed - expected) / expected * 100.0
 }
+
+#[cfg(test)]
+mod tests {
+    use rand::RngExt;
+
+    use crate::game::P;
+
+    use super::*;
+
+    fn rng_with_first_merge_success(level: usize) -> StdRng {
+        for seed in 0_u64..100_000 {
+            let mut rng = StdRng::seed_from_u64(seed);
+            if rng.random_bool(P[level]) {
+                return StdRng::seed_from_u64(seed);
+            }
+        }
+
+        panic!("no successful merge seed found in test range");
+    }
+
+    #[test]
+    fn target_two_returns_after_first_successful_merge() {
+        let mut rng = rng_with_first_merge_success(1);
+
+        assert_eq!(simulate_target_cost_once_with_rng(2, false, &mut rng), 2);
+    }
+
+    #[test]
+    fn fixed_seed_single_run_is_reproducible_with_and_without_pity() {
+        for enable_pity in [false, true] {
+            let mut first_rng = StdRng::seed_from_u64(123);
+            let mut second_rng = StdRng::seed_from_u64(123);
+
+            assert_eq!(
+                simulate_target_cost_once_with_rng(5, enable_pity, &mut first_rng),
+                simulate_target_cost_once_with_rng(5, enable_pity, &mut second_rng)
+            );
+        }
+    }
+
+    #[test]
+    fn fixed_seed_trials_are_reproducible_with_multiple_threads() {
+        for enable_pity in [false, true] {
+            let first = simulate_target_cost_trials(4, 32, Some(2), Some(456), enable_pity);
+            let second = simulate_target_cost_trials(4, 32, Some(2), Some(456), enable_pity);
+
+            assert_eq!(first.threads, 2);
+            assert_eq!(first.samples.len(), 32);
+            assert_eq!(first.samples, second.samples);
+        }
+    }
+}
