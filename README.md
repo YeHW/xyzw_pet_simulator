@@ -55,6 +55,7 @@ GitHub Actions 会在推送到 `main` 或针对 `main` 的 pull request 上执�
 - [target-cost 模拟](doc/target-cost-simulation.md)
 - [stock-drain 模拟](doc/stock-drain-simulation.md)
 - [输出格式规范（CSV/JSON）](doc/output-spec.md)
+- [版本与兼容性策略](doc/versioning.md)
 
 ## 模拟模式
 

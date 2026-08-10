@@ -1,7 +1,13 @@
 [package]
 name = "xyzw_pet_simulator"
-version = "0.1.0"
+version = "0.9.0"
 edition = "2024"
+rust-version = "1.85"
+description = "Monte Carlo simulator for XYZW pet merging"
+license = "MIT"
+repository = "https://github.com/YeHW/xyzw_pet_simulator"
+readme = "README.md"
+publish = false
 
 [[bin]]
 name = "xyzw-petsim"
