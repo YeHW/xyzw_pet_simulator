@@ -47,7 +47,7 @@ jobs:
           $archive = "xyzw-petsim-$env:GITHUB_REF_NAME-x86_64-pc-windows-msvc.zip"
           Compress-Archive -Path dist/* -DestinationPath $archive
           $hash = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLower()
-          "$hash  $archive" | Out-File -Encoding ascii "$archive.sha256"
+          [IO.File]::WriteAllText("$archive.sha256", "$hash  $archive`n", [Text.Encoding]::ASCII)
       - uses: actions/upload-artifact@v4
         with:
           name: windows-x86_64
