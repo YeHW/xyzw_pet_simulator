@@ -35,14 +35,14 @@ pub fn try_merge(state: &mut GameState, level: usize, rng: &mut impl Rng) {
 pub fn check_pity(state: &mut GameState) -> [usize; 8] {
     let mut redeemed = [0usize; 8];
 
-    for level in 2..=7 {
+    for (level, redeemed_count) in redeemed.iter_mut().enumerate().skip(2) {
         if state.pity[level] == pity_threshold(level) {
             // 消耗保底次数
             state.pity[level] = 0;
 
             // 获得一个对应等级宠物
             state.pets[level] += 1;
-            redeemed[level] += 1;
+            *redeemed_count += 1;
         }
     }
 
