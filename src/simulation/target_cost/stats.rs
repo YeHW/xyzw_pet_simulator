@@ -6,10 +6,11 @@ fn percentile(sorted: &[usize], q: f64) -> usize {
 }
 
 pub(crate) fn summarize_target_cost_samples(
-    mut samples: Vec<usize>,
+    samples: Vec<usize>,
     threads: usize,
 ) -> TargetCostSimulationResult {
-    samples.sort_unstable();
+    let mut sorted = samples.clone();
+    sorted.sort_unstable();
 
     let trials = samples.len();
     let sum: u128 = samples.iter().map(|&x| x as u128).sum();
@@ -35,8 +36,8 @@ pub(crate) fn summarize_target_cost_samples(
         0.0
     };
 
-    let min = samples[0];
-    let max = samples[samples.len() - 1];
+    let min = sorted[0];
+    let max = sorted[sorted.len() - 1];
 
     TargetCostSimulationResult {
         trials,
@@ -47,9 +48,24 @@ pub(crate) fn summarize_target_cost_samples(
         ci95_high: mean + ci_margin,
         min,
         max,
-        p50: percentile(&samples, 0.50),
-        p90: percentile(&samples, 0.90),
-        p95: percentile(&samples, 0.95),
+        p50: percentile(&sorted, 0.50),
+        p90: percentile(&sorted, 0.90),
+        p95: percentile(&sorted, 0.95),
         samples,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::summarize_target_cost_samples;
+
+    #[test]
+    fn preserves_trial_order_while_computing_order_statistics() {
+        let result = summarize_target_cost_samples(vec![9, 1, 5], 1);
+
+        assert_eq!(result.samples, vec![9, 1, 5]);
+        assert_eq!(result.min, 1);
+        assert_eq!(result.p50, 5);
+        assert_eq!(result.max, 9);
     }
 }
